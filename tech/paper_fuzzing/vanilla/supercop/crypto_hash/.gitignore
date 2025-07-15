@@ -1,0 +1,6 @@
+fuzzinputs/
+fuzzoutputs/
+crashes/
+obj/
+bin/
+log
