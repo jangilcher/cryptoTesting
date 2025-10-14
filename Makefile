@@ -27,7 +27,7 @@ libkeccak:
 	cd libkeccak; make -j; make install
 
 ches_deps:
-	sudo apt-get install -y --no-install-recommends python3-pip astyle gcc ninja-build libssl-dev python3-pytest python3-pytest-xdist unzip xsltproc doxygen graphviz python3-yaml valgrind
+	sudo apt-get install -y --no-install-recommends python3-pip astyle gcc-8 ninja-build libssl-dev python3-pytest python3-pytest-xdist unzip xsltproc doxygen graphviz python3-yaml valgrind
 	pip3 install setuptools
 	pip3 install scikit-build
 	pip3 install cmake==3.22
@@ -35,7 +35,7 @@ ches_deps:
 ches_liboqs: common ches_deps
 	git clone https://github.com/open-quantum-safe/liboqs.git ches_liboqs
 	mkdir -p ches_liboqs/build
-	cd ches_liboqs/build; git checkout 0.14.0; cmake -GNinja .. ; ninja
+	cd ches_liboqs/build; git checkout 0.14.0; cmake -GNinja -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_ASM_COMPILER=gcc-8 .. ; ninja
 
 ches_liboqs_afl: common ches_deps
 	git clone https://github.com/open-quantum-safe/liboqs.git ches_liboqs_afl
@@ -122,7 +122,7 @@ mid_liboqs_afl: common mid_deps
 	cd mid_liboqs_afl/build; cmake -GNinja -DCMAKE_C_COMPILER=$(AFLCC) -DCMAKE_ASM_COMPILER=$(AFLCC) .. ; ninja
 
 aflpp_deps:
-	sudo apt-get install -y --no-install-recommends curl python3-sympy python3-bitarray python3-cffi python3-dev gcc-7-plugin-dev
+	sudo apt-get install -y --no-install-recommends curl python3-sympy python3-bitarray python3-cffi python3-dev gcc-7-plugin-dev g++-8
 	if [ ! -d "/root/.cargo" ]; then curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y; fi
 	# info: latest update on 2023-12-28, rust version 1.75.0 (82e1608df 2023-12-21) works
 
