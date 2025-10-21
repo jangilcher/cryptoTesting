@@ -42,20 +42,6 @@ ches_liboqs_afl: common ches_deps
 	mkdir -p ches_liboqs_afl/build
 	cd ches_liboqs_afl/build; git checkout 0.14.0; cmake -GNinja -DCMAKE_C_COMPILER=$(AFLCC) -DCMAKE_ASM_COMPILER=$(AFLCC) .. ; ninja
 
-ches2_deps: ches_deps
-	sudo apt-get install -y --no-install-recommends gcc-8
-
-ches2_liboqs: common ches2_deps
-	git clone https://github.com/open-quantum-safe/liboqs.git ches2_liboqs
-	mkdir -p ches2_liboqs/build
-	cd ches2_liboqs/build; git checkout 0.13.0; cmake -GNinja -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_ASM_COMPILER=gcc-8 .. ; ninja
-
-ches2_liboqs_afl: common ches_deps
-	git clone https://github.com/open-quantum-safe/liboqs.git ches2_liboqs_afl
-	mkdir -p ches2_liboqs_afl/build
-	cd ches2_liboqs_afl/build; git checkout 0.13.0; cmake -GNinja -DCMAKE_C_COMPILER=$(AFLCC) -DCMAKE_ASM_COMPILER=$(AFLCC) .. ; ninja
-
-
 cur_deps:
 	sudo apt-get install -y --no-install-recommends python3-pip astyle gcc ninja-build python3-pytest python3-pytest-xdist doxygen graphviz python3-yaml valgrind
 	pip3 install setuptools
@@ -151,7 +137,7 @@ supercop: supercop_deps
 	unxz < supercop-20240107.tar.xz | tar -xf -
 	cp -r supercop-20240107 supercop-20240107.backup
 	cp -r /fuzzing/tech/paper_fuzzing/supercop/crypto_hash /fuzzing/tech/paper_fuzzing/crypto_hash.backup
-	cp /fuzzing/tech/paper_fuzzing/supercop/crypto_hash/*  supercop-20240107/crypto_hash/
+	cp -r /fuzzing/tech/paper_fuzzing/supercop/crypto_hash/*  supercop-20240107/crypto_hash/
 	rm -rf /fuzzing/tech/paper_fuzzing/supercop
 	mv supercop-20240107 /fuzzing/tech/paper_fuzzing/supercop
 	echo "Running supercop's data-init: please wait"
@@ -159,13 +145,13 @@ supercop: supercop_deps
 	echo "data-init done"
 	cp -r /fuzzing/tech/paper_fuzzing/supercop-data /fuzzing/tech/paper_fuzzing/supercop-data.backup
 	cd /fuzzing/tech/paper_fuzzing/supercop/crypto_hash/; make clean libs
-	cd /fuzzing/tech/paper_fuzzing/supercop/crypto_hash/; SUPERDIR=/fuzzing/tech/paper_fuzzing/supercop time ./supercop.sh -l 1 -u 257
+	cd /fuzzing/tech/paper_fuzzing/supercop/crypto_hash/; bash -c "time bash -c \"SUPERDIR=/fuzzing/tech/paper_fuzzing/supercop ./supercop.sh -l 1 -u 257\""
 
 supercop_baseline_init: supercop_deps
 	unxz < supercop-20240107.tar.xz | tar -xf -
 	cp -r supercop-20240107 supercop-20240107.backup
 	cp -r /fuzzing/tech/paper_fuzzing/vanilla/supercop/crypto_hash /fuzzing/tech/paper_fuzzing/vanilla/crypto_hash.backup
-	cp /fuzzing/tech/paper_fuzzing/vanilla/supercop/crypto_hash/*  supercop-20240107/crypto_hash/
+	cp -r /fuzzing/tech/paper_fuzzing/vanilla/supercop/crypto_hash/*  supercop-20240107/crypto_hash/
 	rm -rf /fuzzing/tech/paper_fuzzing/vanilla/supercop
 	mv supercop-20240107 /fuzzing/tech/paper_fuzzing/vanilla/supercop
 	echo "Running supercop's data-init: please wait"
@@ -182,9 +168,10 @@ supercop_baseline: supercop_baseline_init supercop_baseline_run
 all_deps: common libkeccak cur_deps mid_deps old_deps aflpp_deps supercop_deps ches_deps
 
 make clean:
-	-rm -rf cur_liboqs
-	-rm -rf mid_liboqs
-	-rm -rf old_liboqs
+	-rm -rf ches_liboqs ches_liboqs_afl
+	-rm -rf cur_liboqs cur_liboqs_afl
+	-rm -rf mid_liboqs mid_liboqs_afl
+	-rm -rf old_liboqs old_liboqs_afl
 	-rm -rf aflpp
 	-rm -rf libkeccak
 	-rm -rf supercop-20240107 supercop-20240107.tar.xz
