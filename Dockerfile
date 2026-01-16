@@ -72,7 +72,7 @@ COPY Makefile /fuzzing/Makefile
 
 # Define working directory.
 WORKDIR /fuzzing
-ENV HOME /root
+ENV HOME="/root"
 
 # Install dependences
 RUN make all_deps
@@ -92,6 +92,7 @@ RUN mkdir -p /fuzzing/tech/paper_fuzzing/supercop/crypto_hash
 COPY tech/paper_fuzzing/supercop/crypto_hash/. /fuzzing/tech/paper_fuzzing/supercop/crypto_hash
 COPY supercop_report.py /fuzzing/supercop_report.py
 COPY supercop_report_baseline.py /fuzzing/supercop_report_baseline.py
+COPY reproduce.sh /fuzzing/reproduce.sh
 
 RUN make aflpp
 # RUN make cur_liboqs

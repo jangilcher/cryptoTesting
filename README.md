@@ -7,15 +7,16 @@ Code release for
 > IACR Transactions on Cryptographic Hardware and Embedded Systems, 2026(1).
 > https://eprint.iacr.org/2024/1122
 
+In this repository, we include [instructions](#instructions-to-run) to run our tests, [instructions](#baseline) to run a baseline of generic fuzzing, and an [explanation](#source-code-structure) of our source code explaining how it is structured.
+
 ## Dependencies
 
-Docker
+- Docker
+- (Soft dependence): a server with 16+ cores to run the tests in parallel. See Table 2 of the paper for wall times for test completion on 31-core and 75-core machines.
 
 ## Instructions to run
 
 ```bash
-sudo bash -c "echo core >/proc/sys/kernel/core_pattern" # to enable afl++ fuzzing
-bash build.sh
 bash run.sh
 ```
 A terminal within the container will open.
@@ -23,17 +24,14 @@ A terminal within the container will open.
 ### To run experiments on liboqs
 
 To run experiments on version:
-- 2018-11, replace `ver_liboqs` with `old_liboqs` below.
-- 0.4.0, replace `ver_liboqs` with `mid_liboqs` below.
-- 0.8.0, replace `ver_liboqs` with `cur_liboqs` below.
 - 0.14.0, replace `ver_liboqs` with `ches_liboqs` below.
+- 0.8.0, replace `ver_liboqs` with `cur_liboqs` below.
+- 0.4.0, replace `ver_liboqs` with `mid_liboqs` below.
+- 2018-11, replace `ver_liboqs` with `old_liboqs` below.
 
 Within the container, run
 ```bash
-export LIBOQS=ver_liboqs
-make ${LIBOQS}                                                    # to install dependences
-python3 fuzz_liboqs.py --liboqs ${LIBOQS} --logfile ${LIBOQS}.log # to run experiments
-python3 report.py --liboqs ${LIBOQS}                              # to collect results
+bash reproduce.sh ver_liboqs
 ```
 
 Comment the values in `BLACKLIST` on lines 35-42 of `fuzz_liboqs.py` if you want a full run (it will take significantly longer).
@@ -42,9 +40,7 @@ Comment the values in `BLACKLIST` on lines 35-42 of `fuzz_liboqs.py` if you want
 
 Within the container
 ```bash
-make get_supercop                                                 # download supercop-20240107.tar.xz
-make supercop                                                     # to install supercop and run experiments
-python3 supercop_report.py                                        # to collect results
+bash reproduce.sh supercop
 ```
 
 ## Reports
@@ -84,27 +80,29 @@ This may result in slightly different numbers if reproducing our experiments on 
 
 The instructions in this section allow reproducing the experimental results from section "5.1.1 Baseline" in the paper.
 
+First, create and run the same container as for the above experiments by running.
+```bash
+bash run.sh
+```
+A terminal within the container will open.
+
 ### To run the baseline on liboqs
 To run experiments on version:
-- 2018-11, replace `ver_liboqs` with `old_liboqs_afl` below.
-- 0.4.0, replace `ver_liboqs` with `mid_liboqs_afl` below.
-- 0.8.0, replace `ver_liboqs` with `cur_liboqs_afl` below.
 - 0.14.0, replace `ver_liboqs` with `ches_liboqs_afl` below.
+- 0.8.0, replace `ver_liboqs` with `cur_liboqs_afl` below.
+- 0.4.0, replace `ver_liboqs` with `mid_liboqs_afl` below.
+- 2018-11, replace `ver_liboqs` with `old_liboqs_afl` below.
 
 Within the container, run
 ```bash
-export LIBOQS=ver_liboqs
-make ${LIBOQS}                                                    # to install dependences
-python3 fuzz_liboqs_baseline.py --liboqs ${LIBOQS} --logfile ${LIBOQS}.log # to run experiments
-python3 report_baseline.py --liboqs ${LIBOQS}                              # to collect results
+bash reproduce.sh ver_liboqs baseline
 ```
 
-### To run experiments on supercop 20240107
+### To run the baseline on supercop 20240107
 
 Within the container, run
 ```bash
-make get_supercop                                                 # download supercop-20240107.tar.xz
-make supercop_baseline                                            # to install supercop and run experiments
+bash reproduce.sh supercop baseline
 ```
 
 # Source code structure
