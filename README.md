@@ -15,6 +15,11 @@ In this repository, we include [instructions](#instructions-to-run) to run our t
 - (Soft dependence): a server with 16+ cores to run the tests in parallel. See Table 2 of the paper for wall times for test completion on 31-core and 75-core machines.
 
 ## Instructions to run
+First, you'll need to build the docker container in order to run the fuzzing tests.
+```bash
+bash build.sh
+```
+Then, you'll need to start the container in order to reproduce the fuzzing reports in this repo.
 
 ```bash
 bash run.sh
