@@ -1,0 +1,49 @@
+name: Cryptographic Testing MVP
+
+on:
+  workflow_dispatch:
+    inputs:
+      algorithm:
+        description: "LibOQS algorithm index"
+        required: true
+        default: "17"
+        type: string
+
+jobs:
+  crypto-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          bash build.sh
+
+      - name: Prepare output directory
+        run: |
+          mkdir -p mvp
+
+      - name: Run Test 7
+        run: |
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE/mvp:/fuzzing/tech/paper_fuzzing/liboqs/KEM/Decaps/c/mvp" \
+            u18-fuzzing-crypto-image \
+            bash -lc '
+              make cur_liboqs &&
+              cd /fuzzing/tech/paper_fuzzing/liboqs/KEM/Decaps/c &&
+              DIRNAME=cur_liboqs make clean all &&
+              time python3 run_all.py \
+                --mutator python \
+                --run_specific_alg_only ${{ inputs.algorithm }} \
+                --base_path mvp
+            '
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: crypto-testing-results
+          path: mvp/
+          if-no-files-found: warn
